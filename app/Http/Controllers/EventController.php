@@ -3,15 +3,21 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Event;
+use Illuminate\Support\Facades\Validator;
 
 class EventController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+// GET /api/event
+// Devuelve la lista de todos los eventos.
     public function index()
     {
-        //
+        $events = Event::all();
+
+        return response()->json(['message' => null, 'data' => $events], 200);
     }
 
     /**
@@ -27,7 +33,22 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // 1. Validamos los datos que llegan en el JSON
+        $validator = Validator::make($request->all(), [
+            'event_name'   => 'required|string|max:255',
+            'event_detail' => 'nullable|string|max:255',
+        ]);
+
+        // 2. Si algo falla, devolvemos los errores
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Failed', 'data' => $validator->messages()], 400);
+        }
+
+        // 3. Guardamos el evento en la base de datos
+        $event = Event::create($validator->validated());
+
+        // 4. Devolvemos el evento creado
+        return response()->json(['message' => 'Event Created', 'data' => $event], 200);
     }
 
     /**
