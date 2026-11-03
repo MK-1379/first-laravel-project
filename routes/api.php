@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventTypeController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,4 +29,8 @@ Route::controller(EventController::class)->group(function() {
     Route::get('event', 'index');
     Route::post('event', 'store');
     Route::get('event/{event}/users', 'listUsers');
+});
+
+Route::controller(EventTypeController::class)->group(function() {
+    Route::get('type/{type}', 'listEvents');
 });
