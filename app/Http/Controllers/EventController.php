@@ -16,8 +16,7 @@ class EventController extends Controller
     public function index()
     {
         $events = Event::all();
-
-        return response()->json(['message' => null, 'data' => $events], 200);
+        return response()->json(['message' => 'Eventos totales', 'data' => $events], 200);
     }
 
     /**
@@ -57,7 +56,8 @@ class EventController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $event = Event::findOrFail($id);
+        return response()->json(['message' => 'Event Updated', 'data' => $event], 200);
     }
 
     /**
@@ -65,7 +65,7 @@ class EventController extends Controller
      */
     public function edit(string $id)
     {
-        //
+
     }
 
     /**
@@ -79,9 +79,15 @@ class EventController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
-        //
+        $event = Event::findOrFail($id);
+        $res = $event->delete();
+
+        if($res){
+            return response()->json(['message' => 'Evento eliminado', 'data' => $event], 201);
+        }
+        return response()->json(['message' => 'Error eliminando el evento', 'data' => $event], 500);
     }
 
     public function listUsers(Event $event)
