@@ -11,7 +11,6 @@ class EventType extends Model
 
     protected $fillable = ['description'];
 
-    // Un tipo de evento tiene muchos eventos (1:N)
     public function events()
     {
         return $this->hasMany(Event::class);

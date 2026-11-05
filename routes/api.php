@@ -21,6 +21,7 @@ Route::controller(UserController::class)->group(function(){
 
 Route::controller(AddressController::class)->group(function() {
     Route::post('address', 'store');
+    Route::get('addresses', 'index');
     Route::get('address/{address}', 'show');
     Route::get('address/{address}/user', 'show_user');
 });
@@ -30,6 +31,7 @@ Route::controller(EventController::class)->group(function() {
     Route::get('event/{event}/users', 'listUsers');
     Route::get('events', 'index');
     Route::get('event/{event}', 'show');
+    Route::post('event/{event}', 'destroy');
 });
 
 Route::controller(EventTypeController::class)->group(function() {
