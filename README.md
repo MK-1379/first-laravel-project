@@ -1,59 +1,141 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# First Laravel Project – API REST de usuarios y eventos
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API REST hecha con **Laravel 12** para el módulo de Desarrollo Web en Entorno Servidor (DWES) de 2º de DAW. Gestiona usuarios, sus direcciones, eventos y tipos de evento, y sirve para practicar las tres relaciones principales de Eloquent.
 
-## About Laravel
+## Relaciones
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+| Relación | Modelos | Cómo se implementa |
+| --- | --- | --- |
+| Uno a uno (1:1) | `User` – `Address` | `hasOne` / `belongsTo`, clave foránea `user_id` en `addresses` |
+| Muchos a muchos (N:M) | `User` – `Event` | `belongsToMany` en ambos modelos, tabla pivote `event_user` con una nota por reserva |
+| Uno a muchos (1:N) | `EventType` – `Event` | `hasMany` / `belongsTo`, clave foránea `event_type_id` en `events` |
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tecnologías
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.2+
+- Laravel 12
+- MySQL / MariaDB (XAMPP)
+- Laravel Sanctum
+- Insomnia / Postman para probar la API
 
-## Learning Laravel
+## Instalación
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+```bash
+git clone https://github.com/MK-1379/first-laravel-project.git
+cd first-laravel-project
+composer install
+cp .env.example .env
+php artisan key:generate
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Configura la base de datos en el `.env` (ajusta el puerto si tu MySQL no usa el 3306):
 
-## Laravel Sponsors
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=laravel_dwes202
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Crea la base de datos vacía `laravel_dwes202` y ejecuta:
 
-### Premium Partners
+```bash
+php artisan migrate
+php artisan serve
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+La API queda disponible en `http://localhost:8000/api`.
 
-## Contributing
+## Endpoints
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Todas las peticiones deben llevar la cabecera `Accept: application/json`.
 
-## Code of Conduct
+### Usuarios
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+| Método | Ruta | Descripción |
+| --- | --- | --- |
+| POST | `/api/register` | Registra un usuario (`name`, `email`, `password`, `c_password`) |
+| GET | `/api/user/{user}` | Muestra un usuario |
+| GET | `/api/user/{user}/address` | Muestra la dirección de un usuario |
+| GET | `/api/user/{user}/events` | Lista los eventos reservados por un usuario |
+| POST | `/api/users/{user}/events/{event}/book` | Reserva un evento para un usuario (`note` opcional) |
 
-## Security Vulnerabilities
+### Direcciones
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+| Método | Ruta | Descripción |
+| --- | --- | --- |
+| POST | `/api/address` | Crea la dirección de un usuario (`email`, `country`, `zipcode`) |
+| GET | `/api/addresses` | Lista todas las direcciones |
+| GET | `/api/address/{address}` | Muestra una dirección |
+| GET | `/api/address/{address}/user` | Muestra el usuario de una dirección |
 
-## License
+### Eventos
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Método | Ruta | Descripción |
+| --- | --- | --- |
+| POST | `/api/event` | Crea un evento (`event_name`, `event_detail`, `event_type_id`) |
+| GET | `/api/events` | Lista todos los eventos |
+| GET | `/api/event/{event}` | Muestra un evento |
+| POST | `/api/event/{event}` | Elimina un evento |
+| GET | `/api/event/{event}/users` | Lista los usuarios apuntados a un evento |
+
+### Tipos de evento
+
+| Método | Ruta | Descripción |
+| --- | --- | --- |
+| POST | `/api/type` | Crea un tipo de evento (`description`) |
+| GET | `/api/type/{type}` | Lista los eventos de un tipo |
+
+## Ejemplo de uso
+
+Crear un tipo de evento y después un evento de ese tipo:
+
+```http
+POST /api/type
+Content-Type: application/json
+
+{ "description": "Conferencia" }
+```
+
+```http
+POST /api/event
+Content-Type: application/json
+
+{ "event_name": "Hackaton", "event_detail": "Evento de prueba", "event_type_id": 1 }
+```
+
+Todas las respuestas siguen el formato:
+
+```json
+{
+    "message": "Event Created",
+    "data": { "...": "..." }
+}
+```
+
+Si la validación falla, la API responde con un `400` y los errores de cada campo.
+
+## Estructura principal
+
+```
+app/
+├── Http/Controllers/
+│   ├── UserController.php
+│   ├── AddressController.php
+│   ├── EventController.php
+│   └── EventTypeController.php
+└── Models/
+    ├── User.php
+    ├── Address.php
+    ├── Event.php
+    └── EventType.php
+database/migrations/
+routes/api.php
+```
+
+## Autor
+
+Mario Díaz González – 2º DAW, CSC Jesuitas Logroño
+[GitHub](https://github.com/MK-1379) · [Portfolio](https://mk-1379.github.io)
